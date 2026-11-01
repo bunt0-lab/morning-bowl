@@ -5,6 +5,7 @@
   --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
   color-scheme:light;
 }
+[hidden]{display:none!important}
 html,body{height:100%}
 body{margin:0;background:var(--room);transition:background 1s;color:var(--ink);font-family:var(--font);overflow:hidden;
   -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
