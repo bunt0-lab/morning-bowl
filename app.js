@@ -423,7 +423,7 @@ function aim(e){
     var nearRim=local.y>bowl.userData.rimY-.12;
     var sp=speed();
     if(!onBowl&&armed&&sp>.22&&performance.now()-lastStrike>180){
-      initAudio();strike(Math.min(1,Math.max(.22,(sp-.15)/1.5)));lastStrike=performance.now();armed=false;
+      try{initAudio()}catch(err){}strike(Math.min(1,Math.max(.22,(sp-.15)/1.5)));lastStrike=performance.now();armed=false;
     }
     rubbing=nearRim&&sp>.06;onBowl=true;
     /* tilt mallet so the head leans into the surface */
@@ -435,7 +435,7 @@ function aim(e){
   }
 }
 canvas.addEventListener("pointerdown",function(e){
-  initAudio();holding=true;canvas.classList.add("holding");canvas.setPointerCapture(e.pointerId);hist=[];track(e);
+  try{initAudio()}catch(err){}holding=true;canvas.classList.add("holding");try{canvas.setPointerCapture(e.pointerId)}catch(err){}hist=[];track(e);
   setRay(e);var hit=ray.intersectObject(bowl.userData.mesh,false)[0];
   onBowl=false;armed=true;aim(e);
   if(hit&&performance.now()-lastStrike>180){strike(.62);lastStrike=performance.now();armed=false}
@@ -443,6 +443,21 @@ canvas.addEventListener("pointerdown",function(e){
 canvas.addEventListener("pointermove",function(e){if(!holding)return;track(e);aim(e)});
 function release(){holding=false;rubbing=false;onBowl=false;canvas.classList.remove("holding");m.tPos.copy(REST.pos);m.tDir.copy(REST.dir)}
 canvas.addEventListener("pointerup",release);canvas.addEventListener("pointercancel",release);
+
+/* ============ phones: unlock sound on the first real tap ============ */
+var silentEl=null;
+function silentWav(){var n=8000,b=new ArrayBuffer(44+n),v=new DataView(b),w=function(o,s){for(var i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+  w(0,"RIFF");v.setUint32(4,36+n,true);w(8,"WAVE");w(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,8000,true);v.setUint32(28,8000,true);v.setUint16(32,1,true);v.setUint16(34,8,true);w(36,"data");v.setUint32(40,n,true);
+  for(var i=0;i<n;i++)v.setUint8(44+i,128);return URL.createObjectURL(new Blob([b],{type:"audio/wav"}))}
+function unlock(){
+  try{initAudio();if(ctx&&ctx.state!=="running")ctx.resume();
+    if(ctx){var sb=ctx.createBufferSource();sb.buffer=ctx.createBuffer(1,1,22050);sb.connect(ctx.destination);sb.start(0)}}catch(err){}
+  try{if(!silentEl){silentEl=document.createElement("audio");silentEl.setAttribute("playsinline","");silentEl.loop=true;silentEl.src=silentWav()}
+    if(silentEl.paused&&!document.hidden){var pr=silentEl.play();if(pr&&pr.catch)pr.catch(function(){})}}catch(err){}
+}
+["touchend","pointerup","click","keydown"].forEach(function(t){document.addEventListener(t,unlock,{passive:true})});
+document.addEventListener("visibilitychange",function(){try{if(document.hidden&&silentEl)silentEl.pause()}catch(err){}});
 
 /* ============ picker (swipe) ============ */
 var picker=$("picker"),pbtn=picker.querySelectorAll("button"),pst;
