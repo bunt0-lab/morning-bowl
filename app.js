@@ -268,7 +268,7 @@ function styleMallet(b){
 var UP=new T.Vector3(0,1,0);
 var REST={pos:new T.Vector3(),dir:new T.Vector3()};
 function setRest(b){
-  REST.pos.set(1.25,.09,1.7);REST.dir.set(-1,0,.12).normalize();
+  REST.pos.set(1.0,.09,1.25);REST.dir.set(-.5,0,.87).normalize();
 }
 setRest(BOWLS[0]);
 var HOLD_DIR=new T.Vector3(.55,.78,.32).normalize();

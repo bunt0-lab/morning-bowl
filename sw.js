@@ -1,4 +1,4 @@
-const CACHE="bowl-v19";
+const CACHE="bowl-v20";
 const FILES=["./","index.html","style.css","app.js","manifest.webmanifest","icon-192.png","icon-512.png","icon-180.png","https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)));self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))));self.clients.claim()});
